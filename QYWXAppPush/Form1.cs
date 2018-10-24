@@ -7,9 +7,9 @@ namespace QYWXAppPush
 {
     public partial class Form1 : Form
     {
-        public string corpid = "**********";
-        public string corpsecret = "*****************";//通讯小助手Secret
-        public int agentId = 1000010;
+        public string corpid = "**********";//企业微信id
+        public string corpsecret = "*****************";//企业微信应用secret
+        public int agentId = 0;//企业微信应用id
         public static string filepath = "";
         public static string filename = "";
         static string access_token = "";
