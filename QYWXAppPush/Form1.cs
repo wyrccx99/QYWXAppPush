@@ -2,34 +2,60 @@
 using System;
 using System.Windows.Forms;
 using static QYWXAppPush.Bean;
+using System.Configuration;
 
 namespace QYWXAppPush
 {
     public partial class Form1 : Form
     {
-        public string corpid = "**********";//企业微信id
-        public string corpsecret = "*****************";//企业微信应用secret
-        public int agentId = 0;//企业微信应用id
+        public string corpid = ConfigurationManager.AppSettings["corpid"];//企业微信id
+        public string corpsecret = ConfigurationManager.AppSettings["corpsecret"];//企业微信应用secret
+        //public int agentId = Convert.ToInt32(ConfigurationManager.AppSettings["agentid"]);//企业微信应用id
         public static string filepath = "";
         public static string filename = "";
         static string access_token = "";
         static string msgtype = "";
         static Result result;
+        static string media_id;
         public Form1()
         {
             access_token = WXUtils.GetToken(corpid, corpsecret);
             InitializeComponent();
-            bt_Upload.Visible = false;
+            bt_SimpleUpload.Visible = false;
+            bt_ComplexUpload.Visible = false;
+            tb_mediaid2.Visible = false;
+            tb_PicUrl.Visible = false;
+            tb_url.Visible = false;
+            tb_content.Visible = false;
+            label_picurl.Visible = false;
+            label_url.Visible = false;
+            label_content.Visible = false;
+            label_author.Visible = false;
+            tb_author.Visible = false;
+            
+            cb_ComplexMsgtype.SelectedIndex = 0;
+            cb_SimpleMsgtype.SelectedIndex = 0;
             //pictureBox.SizeMode = PictureBoxSizeMode.AutoSize;
             //pictureBox.BackgroundImageLayout = ImageLayout.Stretch;
         }
 
-        private void bt_Send_Click(object sender, EventArgs e)
+        private void Send(object sender, EventArgs e)
         {
             /*text.content = "你的快递已到，请携带工卡前往邮件中心领取。\n出发前可查看" +
                 "<a href=\"http://work.weixin.qq.com\">邮件中心视频实况" +
                 "</a>，聪明避开排队。";*/
-            string resultStr = WXUtils.SendMessage("706615", null, null, msgtype, agentId, tb_mediaid.Text, 0, access_token);
+            Receiver recceiver = new Receiver();
+            recceiver.touser = "706615";
+            Content content = new Content();
+            content.title = tb_title.Text;
+            content.url = tb_url.Text;
+            content.btntxt = tb_btntxt.Text;
+            content.picurl = tb_PicUrl.Text;
+            content.text = tb_SimpleDescription.Text;
+            content.content = tb_content.Text;
+            content.description = tb_ComplexDescription.Text;
+            content.author = tb_author.Text;
+            string resultStr = WXUtils.SendMessage(recceiver, msgtype, content, media_id, 0, access_token);
             result = JsonConvert.DeserializeObject<Result>(resultStr);
             if (result.errcode == 0)
             {
@@ -42,7 +68,7 @@ namespace QYWXAppPush
 
         }
 
-        private void bt_Upload_Click(object sender, EventArgs e)
+        private void Upload(object sender, EventArgs e)
         {
             OpenFileDialog dialog = new OpenFileDialog();
             dialog.Multiselect = false;//该值确定是否可以选择多个文件
@@ -50,6 +76,9 @@ namespace QYWXAppPush
             switch (msgtype)
             {
                 case "image":
+                    dialog.Filter = "文件(*.jpg,*.jpeg,*.png,*.gif)|*.jpg;*.jpeg;*.png;*.gif"; //文件筛选
+                    break;
+                case "mpnews":
                     dialog.Filter = "文件(*.jpg,*.jpeg,*.png,*.gif)|*.jpg;*.jpeg;*.png;*.gif"; //文件筛选
                     break;
                 case "voice":
@@ -90,10 +119,21 @@ namespace QYWXAppPush
                 string checkfilesize = WXUtils.CheckFileSize(filepath, msgtype);
                 if (checkfilesize.Equals(""))
                 {
-                    result = WXUtils.UploadMaterial(filepath, filename, access_token, msgtype);
+                    if (msgtype.Equals("mpnews"))
+                    {
+                        result = WXUtils.UploadMaterial(filepath, filename, access_token, "image");
+                    }
+                    else
+                    {
+                        result = WXUtils.UploadMaterial(filepath, filename, access_token, msgtype);
+                    }
+
+                    
                     if (result.errcode == 0)
                     {
                         tb_mediaid.Text = result.media_id;
+                        tb_mediaid2.Text = result.media_id;
+                        media_id = result.media_id;
                     }
                     else
                     {
@@ -114,17 +154,80 @@ namespace QYWXAppPush
 
         }
 
-        private void cb_msgtype_SelectedIndexChanged(object sender, EventArgs e)
+        private void cb_SimpleMsgtype_SelectedIndexChanged(object sender, EventArgs e)
         {
             tb_mediaid.Text = "";
-            msgtype = cb_msgtype.SelectedItem.ToString();
+            tb_SimpleDescription.Text = "";
+            msgtype = cb_SimpleMsgtype.SelectedItem.ToString();
             if (!msgtype.Equals("text"))
             {
-                bt_Upload.Visible = true;
+                bt_SimpleUpload.Visible = true;
             }
             else
             {
-                bt_Upload.Visible = false;
+                bt_SimpleUpload.Visible = false;
+            }
+        }
+
+        private void cb_ComplexMsgtype_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            tb_mediaid2.Text = "";
+            tb_ComplexDescription.Text = "";
+            tb_title.Text = "";
+            tb_url.Text = "";
+            tb_PicUrl.Text = "";
+            tb_content.Text = "";
+            tb_author.Text = "";
+            tb_btntxt.Text = "";
+
+            msgtype = cb_ComplexMsgtype.SelectedItem.ToString();
+            
+            if (msgtype.Equals("textcard") || msgtype.Equals("news"))
+            {
+                bt_ComplexUpload.Visible = false;
+                tb_mediaid2.Visible = false;
+                tb_url.Visible = true;
+                label_url.Visible = true;
+                label_mediaid2.Visible = false;
+                tb_btntxt.Visible = true;
+                label_btntxt.Visible = true;
+                label_author.Visible = false;
+                tb_author.Visible = false;
+                if (!msgtype.Equals("textcard"))
+                {
+                    tb_PicUrl.Visible = true;
+                    label_picurl.Visible = true;
+                }
+            }
+            else if(msgtype.Equals("video"))
+            {
+                bt_ComplexUpload.Visible = true;
+                tb_mediaid2.Visible = true;
+                tb_PicUrl.Visible = false;
+                tb_url.Visible = false;
+                label_picurl.Visible = false;
+                label_url.Visible = false;
+                tb_btntxt.Visible = false;
+                label_btntxt.Visible = false;
+                label_mediaid2.Visible = true;
+                label_author.Visible = false;
+                tb_author.Visible = false;
+            }
+            else
+            {
+                tb_btntxt.Visible = true;
+                label_btntxt.Visible = true;
+                bt_ComplexUpload.Visible = true;
+                tb_mediaid2.Visible = true;
+                tb_PicUrl.Visible = false;
+                tb_url.Visible = true;
+                label_picurl.Visible = false;
+                label_url.Visible = true;
+                label_mediaid2.Visible = true;
+                label_author.Visible = true;
+                tb_author.Visible = true;
+                tb_content.Visible = true;
+                label_content.Visible = true;
             }
         }
 

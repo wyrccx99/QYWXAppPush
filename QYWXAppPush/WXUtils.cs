@@ -1,6 +1,7 @@
 ﻿using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
+using System.Configuration;
 using System.IO;
 using System.Linq;
 using System.Net;
@@ -8,6 +9,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using static QYWXAppPush.Bean;
+using static QYWXAppPush.Bean.MpNews;
 
 namespace QYWXAppPush
 {
@@ -63,20 +65,23 @@ namespace QYWXAppPush
 
         #region 消息发送函数
         //发送消息
-        public static string SendMessage(string touser, string toparty, string totag, string msgtype, int agentid, string media_id_or_content, int safe, string token)
+        public static string SendMessage(Receiver receiver, string msgtype, Content content, string media_id, int safe, string token)
         {
+            int agentid = Convert.ToInt32(ConfigurationManager.AppSettings["agentid"]);
             string result = "";
             string messagejson = "";
             Text text;
             TextMessage textmessage;
+            Articles articles;
+            List<Articles> listarticle;
             switch (msgtype)
             {
 
                 case "text":
                     text = new Text();
                     textmessage = new TextMessage();
-                    text.content = media_id_or_content;
-                    textmessage.touser = touser;
+                    text.content = content.text;
+                    textmessage.touser = receiver.touser;
                     textmessage.msgtype = msgtype;
                     textmessage.agentid = agentid;
                     textmessage.text = text;
@@ -85,9 +90,9 @@ namespace QYWXAppPush
                     break;
                 case "image":
                     Image image = new Image();
-                    image.media_id = media_id_or_content;
+                    image.media_id = media_id;
                     ImageMessage imagemessage = new ImageMessage();
-                    imagemessage.touser = touser;
+                    imagemessage.touser = receiver.touser;
                     imagemessage.msgtype = msgtype;
                     imagemessage.agentid = agentid;
                     imagemessage.image = image;
@@ -96,9 +101,9 @@ namespace QYWXAppPush
                     break;
                 case "voice":
                     Voice voice = new Voice();
-                    voice.media_id = media_id_or_content;
+                    voice.media_id = media_id;
                     VoiceMessage voicemessage = new VoiceMessage();
-                    voicemessage.touser = touser;
+                    voicemessage.touser = receiver.touser;
                     voicemessage.msgtype = msgtype;
                     voicemessage.agentid = agentid;
                     voicemessage.voice = voice;
@@ -107,20 +112,86 @@ namespace QYWXAppPush
                     break;
                 case "file":
                     Files file = new Files();
-                    file.media_id = media_id_or_content;
+                    file.media_id = media_id;
                     FilesMessage filemessage = new FilesMessage();
-                    filemessage.touser = touser;
+                    filemessage.touser = receiver.touser;
                     filemessage.msgtype = msgtype;
                     filemessage.agentid = agentid;
                     filemessage.file = file;
                     messagejson = JsonConvert.SerializeObject(filemessage);
                     result = PostJson(token, messagejson);
                     break;
+                case "video":
+                    Video video = new Video();
+                    video.media_id = media_id;
+                    video.title = content.title;
+                    video.description = content.description;
+                    VideoMessage videomessage = new VideoMessage();
+                    videomessage.touser = receiver.touser;
+                    videomessage.msgtype = msgtype;
+                    videomessage.agentid = agentid;
+                    videomessage.video = video;
+                    messagejson = JsonConvert.SerializeObject(videomessage);
+                    result = PostJson(token, messagejson);
+                    break;
+                case "textcard":
+                    TextCard textcard = new TextCard();
+                    textcard.title = content.title;
+                    textcard.description = content.description;
+                    textcard.url = content.url;
+                    textcard.btntxt = content.btntxt;
+                    TextCardMessage textcardmessage = new TextCardMessage();
+                    textcardmessage.touser = receiver.touser;
+                    textcardmessage.msgtype = msgtype;
+                    textcardmessage.agentid = agentid;
+                    textcardmessage.textcard = textcard;
+                    messagejson = JsonConvert.SerializeObject(textcardmessage);
+                    result = PostJson(token, messagejson);
+                    break;
+                case "news":
+                    News news = new News();
+                    articles = new Articles();
+                    articles.title = content.title;
+                    articles.description = content.description;
+                    articles.url = content.url;
+                    articles.picurl = content.picurl;
+                    articles.btntxt = content.btntxt;
+                    listarticle = new List<Articles>();
+                    listarticle.Add(articles);
+                    news.articles = listarticle;
+                    NewsMessage newsmessage = new NewsMessage();
+                    newsmessage.touser = receiver.touser;
+                    newsmessage.msgtype = msgtype;
+                    newsmessage.agentid = agentid;
+                    newsmessage.news = news;
+                    messagejson = JsonConvert.SerializeObject(newsmessage);
+                    result = PostJson(token, messagejson);
+                    break;
+                case "mpnews":
+                    MpNews mpnews = new MpNews();
+                    articles = new Articles();
+                    articles.title = content.title;
+                    articles.thumb_media_id = media_id;
+                    articles.author = content.author;
+                    articles.content_source_url = content.url;
+                    articles.content = content.content;
+                    articles.digest = content.description;
+                    listarticle = new List<Articles>();
+                    listarticle.Add(articles);
+                    mpnews.articles = listarticle;
+                    MpNewsMessage mpnewsmessage = new MpNewsMessage();
+                    mpnewsmessage.touser = receiver.touser;
+                    mpnewsmessage.msgtype = msgtype;
+                    mpnewsmessage.agentid = agentid;
+                    mpnewsmessage.mpnews= mpnews;
+                    messagejson = JsonConvert.SerializeObject(mpnewsmessage);
+                    result = PostJson(token, messagejson);
+                    break;
                 default:
                     text = new Text();
                     textmessage = new TextMessage();
-                    text.content = media_id_or_content;
-                    textmessage.touser = touser;
+                    text.content = content.text;
+                    textmessage.touser = receiver.touser;
                     textmessage.msgtype = msgtype;
                     textmessage.agentid = agentid;
                     textmessage.text = text;
@@ -175,6 +246,7 @@ namespace QYWXAppPush
         }
         #endregion
 
+        #region 上传临时素材
 
         //上传素材到微信服务器返回media_id
         public static Result UploadMaterial(string filepath, string filename, string token, string type)
@@ -242,6 +314,7 @@ namespace QYWXAppPush
             Result result = JsonConvert.DeserializeObject<Result>(resultStr);
             return result;
         }
+        #endregion
 
         //根据CorpID，secret，code获取微信openid、access token信息
         //访问微信url并返回微信信息
