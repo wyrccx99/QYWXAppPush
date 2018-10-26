@@ -15,12 +15,15 @@ namespace QYWXAppPush
         public static string filename = "";
         static string access_token = "";
         static string msgtype = "";
+        static string receivers = "";
         static Result result;
         static string media_id;
+        static Receiver receiver;
         public Form1()
         {
             access_token = WXUtils.GetToken(corpid, corpsecret);
             InitializeComponent();
+            receiver = new Receiver();
             bt_SimpleUpload.Visible = false;
             bt_ComplexUpload.Visible = false;
             tb_mediaid2.Visible = false;
@@ -32,11 +35,12 @@ namespace QYWXAppPush
             label_content.Visible = false;
             label_author.Visible = false;
             tb_author.Visible = false;
-            
+
+            cb_Receiver.SelectedIndex = 3;
             cb_ComplexMsgtype.SelectedIndex = 0;
             cb_SimpleMsgtype.SelectedIndex = 0;
-            //pictureBox.SizeMode = PictureBoxSizeMode.AutoSize;
-            //pictureBox.BackgroundImageLayout = ImageLayout.Stretch;
+            receivers = cb_Receiver.SelectedItem.ToString();
+            receiver.touser = receivers;
         }
 
         private void Send(object sender, EventArgs e)
@@ -44,8 +48,7 @@ namespace QYWXAppPush
             /*text.content = "你的快递已到，请携带工卡前往邮件中心领取。\n出发前可查看" +
                 "<a href=\"http://work.weixin.qq.com\">邮件中心视频实况" +
                 "</a>，聪明避开排队。";*/
-            Receiver recceiver = new Receiver();
-            recceiver.touser = "706615";
+            
             Content content = new Content();
             content.title = tb_title.Text;
             content.url = tb_url.Text;
@@ -55,7 +58,7 @@ namespace QYWXAppPush
             content.content = tb_content.Text;
             content.description = tb_ComplexDescription.Text;
             content.author = tb_author.Text;
-            string resultStr = WXUtils.SendMessage(recceiver, msgtype, content, media_id, 0, access_token);
+            string resultStr = WXUtils.SendMessage(receiver, msgtype, content, media_id, 0, access_token);
             result = JsonConvert.DeserializeObject<Result>(resultStr);
             if (result.errcode == 0)
             {
@@ -162,10 +165,14 @@ namespace QYWXAppPush
             if (!msgtype.Equals("text"))
             {
                 bt_SimpleUpload.Visible = true;
+                label_simpledes.Visible = false;
+                tb_SimpleDescription.Visible = false;
             }
             else
             {
                 bt_SimpleUpload.Visible = false;
+                label_simpledes.Visible = true;
+                tb_SimpleDescription.Visible = true;
             }
         }
 
@@ -228,6 +235,42 @@ namespace QYWXAppPush
                 tb_author.Visible = true;
                 tb_content.Visible = true;
                 label_content.Visible = true;
+            }
+        }
+
+        private void cb_Receiver_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            receivers = cb_Receiver.SelectedItem.ToString();
+
+            if (receivers.Equals("@all"))
+            {
+                tb_Receiver.Visible = false;
+            }
+            else
+            {
+                tb_Receiver.Visible = true;
+            }
+        }
+
+        private void tb_Receiver_TextChanged(object sender, EventArgs e)
+        {
+            if (receivers.Equals("@all"))
+            {
+                receiver.touser = "@all";
+                receiver.toparty = "";
+                receiver.totag = "";
+            }
+            else if (receivers.Equals("touser"))
+            {
+                receiver.touser = tb_Receiver.Text;
+            }
+            else if (receivers.Equals("toparty"))
+            {
+                receiver.toparty = tb_Receiver.Text;
+            }
+            else if (receivers.Equals("totag"))
+            {
+                receiver.totag = tb_Receiver.Text;
             }
         }
 

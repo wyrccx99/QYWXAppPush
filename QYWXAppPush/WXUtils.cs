@@ -82,6 +82,8 @@ namespace QYWXAppPush
                     textmessage = new TextMessage();
                     text.content = content.text;
                     textmessage.touser = receiver.touser;
+                    textmessage.toparty = receiver.toparty;
+                    textmessage.totag = receiver.totag;
                     textmessage.msgtype = msgtype;
                     textmessage.agentid = agentid;
                     textmessage.text = text;

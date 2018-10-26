@@ -38,7 +38,7 @@
             this.bt_SimpleSend = new System.Windows.Forms.Button();
             this.label8 = new System.Windows.Forms.Label();
             this.cb_SimpleMsgtype = new System.Windows.Forms.ComboBox();
-            this.label7 = new System.Windows.Forms.Label();
+            this.label_simpledes = new System.Windows.Forms.Label();
             this.tb_SimpleDescription = new System.Windows.Forms.TextBox();
             this.tabPage2 = new System.Windows.Forms.TabPage();
             this.tb_author = new System.Windows.Forms.TextBox();
@@ -61,6 +61,9 @@
             this.tb_title = new System.Windows.Forms.TextBox();
             this.label3 = new System.Windows.Forms.Label();
             this.tb_ComplexDescription = new System.Windows.Forms.TextBox();
+            this.tb_Receiver = new System.Windows.Forms.TextBox();
+            this.cb_Receiver = new System.Windows.Forms.ComboBox();
+            this.label4 = new System.Windows.Forms.Label();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox)).BeginInit();
             this.tabcontrol.SuspendLayout();
             this.tabPage1.SuspendLayout();
@@ -78,7 +81,7 @@
             // 
             // label2
             // 
-            this.label2.Location = new System.Drawing.Point(0, 0);
+            this.label2.Location = new System.Drawing.Point(20, -6);
             this.label2.Name = "label2";
             this.label2.Size = new System.Drawing.Size(100, 23);
             this.label2.TabIndex = 0;
@@ -96,12 +99,12 @@
             this.tabcontrol.Controls.Add(this.tabPage1);
             this.tabcontrol.Controls.Add(this.tabPage2);
             this.tabcontrol.Cursor = System.Windows.Forms.Cursors.Default;
-            this.tabcontrol.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.tabcontrol.Location = new System.Drawing.Point(0, 0);
+            this.tabcontrol.Dock = System.Windows.Forms.DockStyle.Bottom;
+            this.tabcontrol.Location = new System.Drawing.Point(0, 37);
             this.tabcontrol.Multiline = true;
             this.tabcontrol.Name = "tabcontrol";
             this.tabcontrol.SelectedIndex = 0;
-            this.tabcontrol.Size = new System.Drawing.Size(603, 493);
+            this.tabcontrol.Size = new System.Drawing.Size(603, 456);
             this.tabcontrol.TabIndex = 17;
             // 
             // tabPage1
@@ -110,14 +113,14 @@
             this.tabPage1.Controls.Add(this.bt_SimpleSend);
             this.tabPage1.Controls.Add(this.label8);
             this.tabPage1.Controls.Add(this.cb_SimpleMsgtype);
-            this.tabPage1.Controls.Add(this.label7);
+            this.tabPage1.Controls.Add(this.label_simpledes);
             this.tabPage1.Controls.Add(this.tb_SimpleDescription);
             this.tabPage1.Controls.Add(this.tb_mediaid);
             this.tabPage1.Controls.Add(this.pictureBox);
             this.tabPage1.Location = new System.Drawing.Point(4, 22);
             this.tabPage1.Name = "tabPage1";
             this.tabPage1.Padding = new System.Windows.Forms.Padding(3);
-            this.tabPage1.Size = new System.Drawing.Size(595, 467);
+            this.tabPage1.Size = new System.Drawing.Size(595, 430);
             this.tabPage1.TabIndex = 0;
             this.tabPage1.Text = "简单消息推送服务";
             this.tabPage1.UseVisualStyleBackColor = true;
@@ -165,14 +168,14 @@
             this.cb_SimpleMsgtype.TabIndex = 15;
             this.cb_SimpleMsgtype.SelectedIndexChanged += new System.EventHandler(this.cb_SimpleMsgtype_SelectedIndexChanged);
             // 
-            // label7
+            // label_simpledes
             // 
-            this.label7.AutoSize = true;
-            this.label7.Location = new System.Drawing.Point(22, 38);
-            this.label7.Name = "label7";
-            this.label7.Size = new System.Drawing.Size(83, 12);
-            this.label7.TabIndex = 14;
-            this.label7.Text = "   描述内容：";
+            this.label_simpledes.AutoSize = true;
+            this.label_simpledes.Location = new System.Drawing.Point(22, 38);
+            this.label_simpledes.Name = "label_simpledes";
+            this.label_simpledes.Size = new System.Drawing.Size(83, 12);
+            this.label_simpledes.TabIndex = 14;
+            this.label_simpledes.Text = "   描述内容：";
             // 
             // tb_SimpleDescription
             // 
@@ -207,7 +210,7 @@
             this.tabPage2.Location = new System.Drawing.Point(4, 22);
             this.tabPage2.Name = "tabPage2";
             this.tabPage2.Padding = new System.Windows.Forms.Padding(3);
-            this.tabPage2.Size = new System.Drawing.Size(595, 467);
+            this.tabPage2.Size = new System.Drawing.Size(595, 430);
             this.tabPage2.TabIndex = 1;
             this.tabPage2.Text = "复杂消息推送服务";
             this.tabPage2.UseVisualStyleBackColor = true;
@@ -388,13 +391,48 @@
             this.tb_ComplexDescription.Size = new System.Drawing.Size(239, 58);
             this.tb_ComplexDescription.TabIndex = 17;
             // 
+            // tb_Receiver
+            // 
+            this.tb_Receiver.Location = new System.Drawing.Point(214, 5);
+            this.tb_Receiver.Multiline = true;
+            this.tb_Receiver.Name = "tb_Receiver";
+            this.tb_Receiver.Size = new System.Drawing.Size(239, 21);
+            this.tb_Receiver.TabIndex = 21;
+            this.tb_Receiver.TextChanged += new System.EventHandler(this.tb_Receiver_TextChanged);
+            // 
+            // cb_Receiver
+            // 
+            this.cb_Receiver.FormattingEnabled = true;
+            this.cb_Receiver.Items.AddRange(new object[] {
+            "touser",
+            "toparty",
+            "totag",
+            "@all"});
+            this.cb_Receiver.Location = new System.Drawing.Point(115, 6);
+            this.cb_Receiver.Name = "cb_Receiver";
+            this.cb_Receiver.Size = new System.Drawing.Size(93, 20);
+            this.cb_Receiver.TabIndex = 20;
+            this.cb_Receiver.SelectedIndexChanged += new System.EventHandler(this.cb_Receiver_SelectedIndexChanged);
+            // 
+            // label4
+            // 
+            this.label4.AutoSize = true;
+            this.label4.Location = new System.Drawing.Point(26, 9);
+            this.label4.Name = "label4";
+            this.label4.Size = new System.Drawing.Size(83, 12);
+            this.label4.TabIndex = 19;
+            this.label4.Text = "   接收范围：";
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.AutoSize = true;
             this.ClientSize = new System.Drawing.Size(603, 493);
+            this.Controls.Add(this.tb_Receiver);
             this.Controls.Add(this.tabcontrol);
+            this.Controls.Add(this.cb_Receiver);
+            this.Controls.Add(this.label4);
             this.Controls.Add(this.label2);
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.Name = "Form1";
@@ -407,6 +445,7 @@
             this.tabPage2.ResumeLayout(false);
             this.tabPage2.PerformLayout();
             this.ResumeLayout(false);
+            this.PerformLayout();
 
         }
 
@@ -416,7 +455,7 @@
         private System.Windows.Forms.TextBox tb_mediaid;
         private System.Windows.Forms.TabControl tabcontrol;
         private System.Windows.Forms.TabPage tabPage1;
-        private System.Windows.Forms.Label label7;
+        private System.Windows.Forms.Label label_simpledes;
         private System.Windows.Forms.TextBox tb_SimpleDescription;
         private System.Windows.Forms.TabPage tabPage2;
         private System.Windows.Forms.Button bt_SimpleUpload;
@@ -443,6 +482,9 @@
         private System.Windows.Forms.Label label_btntxt;
         private System.Windows.Forms.TextBox tb_author;
         private System.Windows.Forms.Label label_author;
+        private System.Windows.Forms.ComboBox cb_Receiver;
+        private System.Windows.Forms.Label label4;
+        private System.Windows.Forms.TextBox tb_Receiver;
     }
 }
 
